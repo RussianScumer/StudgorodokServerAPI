@@ -1,46 +1,52 @@
-<?php // сохранить utf-8 !
-// -------------------------------------------------------------------------- логины пароли
-echo("works");
-$mysql_host = "localhost"; // sql сервер
-$mysql_user = "a0872478_chat"; // пользователь
-$mysql_password = "BkmzRjhyttdtw2003!"; // пароль
-$mysql_database = "a0872478_chat"; // имя базы данных chat
-$mysqli = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
-// -------------------------------------------------------------------------- если база недоступна
-if (!mysqli_connect($mysql_host, $mysql_user, $mysql_password)){
-	echo "<h2>База недоступна!</h2>";
-exit;
-}else{
-// -------------------------------------------------------------------------- если база доступна
-echo "<h2>База доступна!</h2>";
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") { 
+    echo "aboba";
+} 
+$username = $_GET["PHP_AUTH_USER"];
+$password = $_GET["PHP_AUTH_PW"];
+//$username = '8211862';
+//$password = 'BkmzRjhyttdtw2003';
+$resultString = $username . ':' . $password;
+$api_url = 'https://orioks.miet.ru/api/v1/auth'; // Замените на ваш URL
+$encoded_auth = base64_encode($resultString); // Замените на ваши реальные учетные данные
 
+$headers = array(
+    'Accept: application/json',
+    'Authorization: Basic ' . $encoded_auth,
+    'User-Agent: TestApiAPP/0.1 Windows 10',
+    // Замените на реальные данные
+);
+$ch = curl_init($api_url);
 
-mysqli_select_db($mysqli, "f0872518_chat" );
-mysqli_set_charset($mysqli,'utf8');
-// -------------------------------------------------------------------------- выведем JSON
-$q=mysqli_query($mysqli,"SELECT * FROM chat");
-echo "<h3>Json ответ:</h3>";
-// Выводим json
-while($e=mysqli_fetch_assoc($q))
-        $output[]=$e;
-print(json_encode($output));
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-// -------------------------------------------------------------------------- выведем таблицу
-$q=mysqli_query($mysqli,"SELECT * FROM chat");
-echo "<h3>Табличный вид:</h3>";
-echo "<table border=\"1\" width=\"100%\" bgcolor=\"#999999\">";
-echo "<tr><td>_id</td><td>author</td>";
-echo "<td>client</td><td>data</td><td>text</td></tr>";
+$token = curl_exec($ch);
+$api_url2 = 'https://orioks.miet.ru/api/v1/student';
+if ($token === false) {
+    echo 'Ошибка cURL: ' . curl_error($ch);
+} else {
+    $decoded_response = json_decode($token, true); // Парсинг JSON
+    if (isset($decoded_response['token'])) {
+        //echo "true";
+        $headersNew = [
+            'Accept: application/json',
+            'Authorization: Bearer ' . $decoded_response['token'],
+            'User-Agent: TestApiAPP/0.1 Windows 10',
+        ];
+        $ch2 = curl_init($api_url2);
+        curl_setopt($ch2, CURLOPT_HTTPHEADER, $headersNew);
+        curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
 
-for ($c=0; $c<mysqli_num_rows($q); $c++){
-
-$f = mysqli_fetch_array($q);
-echo "<tr><td>$f[_id]</td><td>$f[author]</td><td>$f[client]</td><td>$f[data]</td><td>$f[text]</td></tr>";
-
+        $response = curl_exec($ch2);
+        //echo $response;
+        $decoded_response2 = json_decode($response, true);
+        echo $decoded_response2['full_name'];
+        echo " ";
+        echo $decoded_response2['group'];
+    } else {
+        echo "The response does not contain a token field.";
+    }
 }
- echo "</tr></table>";
-
-}
-mysqli_close($mysqli);
-// -------------------------------------------------------------------------- разорвем соединение с БД
+curl_close($ch);
 ?>
