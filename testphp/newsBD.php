@@ -18,8 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $header = $data["header"];
     $img = $data["img"];
     $content = $data["content"];
-    $stmt = $connection->prepare("INSERT INTO newsDB VALUES (?, ?, ?)");
-    $stmt->bind_param('sbs', $header, $img, $content);
+    $type = $data["type"];
+    $currentDateTime = new DateTime('now');
+    $currentDate = $currentDateTime->format('Y-m-d');
+    $stmt = $connection->prepare("INSERT INTO newsDB (header, img, content, type, dateOfNews) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param('sssss', $header, $img, $content, $type, $currentDate);
     mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
@@ -28,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT header, img, content FROM newsDB ORDER BY header DESC LIMIT 10");
+    $result = $connection->query("SELECT header, img, content, type, dateOfNews FROM newsDB ORDER BY id DESC LIMIT 10");
     $rows = array();
 
     if ($result->num_rows > 0) {
