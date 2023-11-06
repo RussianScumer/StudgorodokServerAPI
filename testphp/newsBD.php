@@ -23,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $currentDate = $currentDateTime->format('Y-m-d');
     $stmt = $connection->prepare("INSERT INTO newsDB (header, img, content, type, dateOfNews) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param('sssss', $header, $img, $content, $type, $currentDate);
-    mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
     $stmt->close();

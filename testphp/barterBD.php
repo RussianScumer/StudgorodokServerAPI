@@ -23,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $category = $data["category"];
     $stmt = $connection->prepare("INSERT INTO barterDB (title, comments, contacts, price, img, category) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $img, $category);
-    //mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
     $stmt->close();
