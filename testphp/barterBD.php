@@ -15,15 +15,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Content-Type:application/json");
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
-    $header = $data["header"];
+    $title = $data["title"];
+    $comments = $data["comments"];
+    $contacts = $data["contacts"];
+    $price = $data["price"];
     $img = $data["img"];
-    $content = $data["content"];
-    $type = $data["type"];
-    $currentDateTime = new DateTime('now');
-    $currentDate = $currentDateTime->format('Y-m-d');
-    $stmt = $connection->prepare("INSERT INTO newsDB (header, img, content, type, dateOfNews) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssss', $header, $img, $content, $type, $currentDate);
-    mysqli_stmt_execute($stmt);
+    $category = $data["category"];
+    $stmt = $connection->prepare("INSERT INTO barterDB (title, comments, contacts, price, img, category) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $img, $category);
+    //mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
     $stmt->close();
@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT header, img, content, type, dateOfNews FROM newsDB ORDER BY id DESC LIMIT 10");
+    $result = $connection->query("SELECT title, comments, contacts, price, img, category FROM barterDB ORDER BY id DESC LIMIT 10");
     $rows = array();
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
