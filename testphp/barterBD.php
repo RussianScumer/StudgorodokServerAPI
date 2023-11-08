@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     file_put_contents($filename, base64_decode($img));
     $stmt = $connection->prepare("INSERT INTO barterDB (title, comments, contacts, price, img, category) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $filename, $category);
-    mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
     $stmt->close();
