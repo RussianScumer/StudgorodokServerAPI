@@ -21,8 +21,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $type = $data["type"];
     $currentDateTime = new DateTime('now');
     $currentDate = $currentDateTime->format('Y-m-d');
+    $filename = "news_img/" . $currentDateTime->format('Y-m-d_H-i-s') . $data["extension"];
+    file_put_contents($filename, base64_decode($img));
     $stmt = $connection->prepare("INSERT INTO newsDB (header, img, content, type, dateOfNews) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssss', $header, $img, $content, $type, $currentDate);
+    $stmt->bind_param('sssss', $header, $filename, $content, $type, $currentDate);
     $stmt->execute();
     echo("successful");
     $stmt->close();
@@ -30,10 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT header, img, content, type, dateOfNews FROM newsDB ORDER BY id DESC LIMIT 10");
+    $result = $connection->query("SELECT header, img, content, type, dateOfNews FROM newsDB ORDER BY id DESC");
     $rows = array();
+
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $row["img"] = "http://a0872478.xsph.ru/" . $row["img"];
             $rows[] = $row;
         }
         header('Content-Type: application/json');

@@ -21,8 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = $data["price"];
     $img = $data["img"];
     $category = $data["category"];
+    $currentDateTime = new DateTime('now');
+    $filename = "barter_img/" . $currentDateTime->format('Y-m-d_H-i-s') . $data["extension"];
+    file_put_contents($filename, base64_decode($img));
     $stmt = $connection->prepare("INSERT INTO barterDB (title, comments, contacts, price, img, category) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $img, $category);
+    $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $filename, $category);
+    mysqli_stmt_execute($stmt);
     $stmt->execute();
     echo("successful");
     $stmt->close();
@@ -30,15 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT title, comments, contacts, price, img, category FROM barterDB ORDER BY id DESC LIMIT 10");
+    $result = $connection->query("SELECT title, comments, contacts, price, img, category FROM barterDB ORDER BY id DESC");
     $rows = array();
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $row["img"] = "http://a0872478.xsph.ru/" . $row["img"];
             $rows[] = $row;
         }
         header('Content-Type: application/json');
         echo json_encode($rows);
-    } else {
+    } 
+    else {
         echo "0 results";
     }
 }

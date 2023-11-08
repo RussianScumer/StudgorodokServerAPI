@@ -20,8 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = $data["price"];
     $img = $data["img"];
     $category = $data["category"];
+    $currentDateTime = new DateTime('now');
+    $filename = "canteen_img/" . $currentDateTime->format('Y-m-d_H-i-s') . $data["extension"];
+    file_put_contents($filename, base64_decode($img));
     $stmt = $connection->prepare("INSERT INTO canteenDB (title, type, price, img, category) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssss', $title, $type, $price, $img, $category);
+    $stmt->bind_param('sssss', $title, $type, $price, $filename, $category);
     $stmt->execute();
     echo("successful");
     $stmt->close();
@@ -29,10 +32,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT title, type, price, img, category FROM canteenDB ORDER BY id DESC LIMIT 10");
+    $result = $connection->query("SELECT title, type, price, img, category FROM canteenDB ORDER BY id DESC");
     $rows = array();
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $row["img"] = "http://a0872478.xsph.ru/" . $row["img"];
             $rows[] = $row;
         }
         header('Content-Type: application/json');
