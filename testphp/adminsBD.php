@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $row["admins"] = "http://a0872478.xsph.ru/" . $row["admins"];
+            $row["admins"] = $row["admins"];
             $rows[] = $row;
         }
         header('Content-Type: application/json');
