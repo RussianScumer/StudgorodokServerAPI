@@ -1,4 +1,11 @@
 <?php
+session_start();
+$check = $_SESSION['user_id'];
+$check = json_decode($check, true);
+if (!isset($check['token'])) {
+    header("HTTP/1.1 401 Unauthorized");
+    exit();
+}
 $mysql_host = "localhost"; 
 $mysql_user = "a0872478_StudgorodokDB"; 
 $mysql_password = "BkmzRjhyttdtw2003!"; 

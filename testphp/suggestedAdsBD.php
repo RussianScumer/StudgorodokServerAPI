@@ -1,6 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+$check = $_SESSION['user_id'];
+$check = json_decode($check, true);
+if (!isset($check['token'])) {
     header("HTTP/1.1 401 Unauthorized");
     exit();
 }

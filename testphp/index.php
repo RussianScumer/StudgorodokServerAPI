@@ -8,7 +8,6 @@ $password = $_GET["PHP_AUTH_PW"];
 $resultString = $username . ':' . $password;
 $api_url = 'https://orioks.miet.ru/api/v1/auth'; 
 $encoded_auth = base64_encode($resultString); 
-
 $headers = array(
     'Accept: application/json',
     'Authorization: Basic ' . $encoded_auth,
@@ -24,7 +23,6 @@ $api_url2 = 'https://orioks.miet.ru/api/v1/student';
 if ($token === false) {
     echo 'Ошибка cURL: ' . curl_error($ch);
 } else {
-    $_SESSION['user_id'] = $token;
     $decoded_response = json_decode($token, true); // Парсинг JSON
     if (isset($decoded_response['token'])) {
         $headersNew = [
@@ -32,6 +30,7 @@ if ($token === false) {
             'Authorization: Bearer ' . $decoded_response['token'],
             'User-Agent: TestApiAPP/0.1 Windows 10',
         ];
+        $_SESSION['user_id'] = $decoded_response;
         $ch2 = curl_init($api_url2);
         curl_setopt($ch2, CURLOPT_HTTPHEADER, $headersNew);
         curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);

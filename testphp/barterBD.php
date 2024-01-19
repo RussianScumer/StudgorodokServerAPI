@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("HTTP/1.1 401 Unauthorized");
+    exit();
+}
 $mysql_host = "localhost"; 
 $mysql_user = "a0872478_StudgorodokDB"; 
 $mysql_password = "BkmzRjhyttdtw2003!"; 
