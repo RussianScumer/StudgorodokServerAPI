@@ -12,20 +12,15 @@ if(!$connection->set_charset($charset)){
     echo "EncodeError";
 }
 
-// Обработка GET запроса
-if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT admins FROM adminsDB");
-    $rows = array();
-
+// Обработка POST запроса
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    header("Content-Type:text/plain");
+    $user = intval(file_get_contents('php://input'));
+    $result = $connection->query("SELECT admins FROM adminsDB WHERE admins = '$user'");
     if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $row["admins"] = $row["admins"];
-            $rows[] = $row;
-        }
-        header('Content-Type: application/json');
-        echo json_encode($rows);
+        echo "admin";
     } else {
-        echo "0 results";
+        echo "not admin";
     }
 }
 $connection->close();

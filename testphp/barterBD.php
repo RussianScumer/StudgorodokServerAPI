@@ -15,29 +15,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Content-Type:application/json");
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
-    $title = $data["title"];
-    $comments = $data["comments"];
-    $contacts = $data["contacts"];
-    $price = $data["price"];
-    $img = $data["img"];
-    $category = $data["category"];
-    $currentDateTime = new DateTime('now');
-    $filename = "barter_img/" . $currentDateTime->format('Y-m-d_H-i-s') . $data["extension"];
-    file_put_contents($filename, base64_decode($img));
-    $stmt = $connection->prepare("INSERT INTO barterDB (title, comments, contacts, price, img, category) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $filename, $category);
-    $stmt->execute();
-    echo("successful");
-    $stmt->close();
+    if ($data["requestType"] == "add") {
+        $title = $data["title"];
+        $comments = $data["comments"];
+        $contacts = $data["contacts"];
+        $price = $data["price"];
+        $img = $data["img"];
+        $stud_number = $data["stud_number"];
+        $currentDateTime = new DateTime('now');
+        if ($img != "") {
+            $filename = "barter_img/" . $currentDateTime->format('Y-m-d_H-i-s') . $data["extension"];
+            file_put_contents($filename, base64_decode($img));    
+        } else {
+            $filename = "";
+        }
+        $stmt = $connection->prepare("INSERT INTO suggestedAdsDB (title, comments, contacts, price, img, stud_number) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('ssssss', $title, $comments, $contacts, $price, $filename, $stud_number);
+        $stmt->execute(); 
+        echo("successful");
+        $stmt->close();
+    } else if ($data["requestType"] == "delete") {
+        $id = intval($data["id"]);
+        $result = $connection->query("SELECT img FROM barterDB WHERE id = '$id'");
+        $row = $result->fetch_assoc();
+        unlink($row["img"]);
+        $request = "DELETE FROM barterDB WHERE id = '$id'";
+        if ($connection->query($request)) {
+            echo("successful");
+        }
+    }
 }
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $result = $connection->query("SELECT title, comments, contacts, price, img, category FROM barterDB ORDER BY id DESC");
+    $result = $connection->query("SELECT id, title, comments, contacts, price, img, stud_number FROM barterDB ORDER BY id DESC");
     $rows = array();
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $row["img"] = "http://a0872478.xsph.ru/" . $row["img"];
+            if ($row["img"] != "") {
+                $row["img"] = "http://a0872478.xsph.ru/" . $row["img"];    
+            }
             $rows[] = $row;
         }
         header('Content-Type: application/json');
