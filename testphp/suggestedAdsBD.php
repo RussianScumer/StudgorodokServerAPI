@@ -1,11 +1,4 @@
 <?php
-session_start();
-$check = $_SESSION['user_id'];
-$check = json_decode($check, true);
-if (!isset($check['token'])) {
-    header("HTTP/1.1 401 Unauthorized");
-    exit();
-}
 $mysql_host = "localhost"; 
 $mysql_user = "a0872478_StudgorodokDB"; 
 $mysql_password = "BkmzRjhyttdtw2003!"; 
@@ -22,6 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Content-Type:application/json");
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
+    $acctoken = $data["acctoken"];
+    $token = $connection->execute_query("SELECT acctoken FROM tokens WHERE acctoken = ?", $acctoken);
+    if($token->num_rows != 0){
     $type = $data["type"];
     if ($type == "approved") {
         $id = intval($data["id"]);
@@ -63,10 +59,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo("no_ads");
         }
     }
+}else{
+    $connection->close();
+    header("HTTP/1.1 401 Unauthorized");
+    exit();
+}
 }
 
 // Обработка GET запроса
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $acctoken = $_GET["PHP_ACCTOKEN"];
+    $token = $connection->execute_query("SELECT acctoken FROM tokens WHERE acctoken = ?", $acctoken);
+    if($token->num_rows != 0){
     $result = $connection->query("SELECT id, title, comments, contacts, price, img, stud_number FROM suggestedAdsDB ORDER BY id DESC");
     $rows = array();
     if ($result->num_rows > 0) {
@@ -82,6 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     else {
         echo "0 results";
     }
+}else {
+    $connection->close();
+    header("HTTP/1.1 401 Unauthorized");
+    exit();
+}
 }
 $connection->close();
 ?>

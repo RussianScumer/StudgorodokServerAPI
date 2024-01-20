@@ -1,4 +1,10 @@
 <?php
+function gen_token() {
+	$bytes = openssl_random_pseudo_bytes(20, $cstrong);
+	return bin2hex($bytes); 
+}
+$accToken = gen_token();
+echo $accToken; 
 $mysql_host = "localhost"; 
 $mysql_user = "a0872478_StudgorodokDB"; 
 $mysql_password = "BkmzRjhyttdtw2003!"; 
@@ -11,17 +17,11 @@ if ($connection->connect_error) {
 if(!$connection->set_charset($charset)){
     echo "EncodeError";
 }
-
-// Обработка POST запроса
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    header("Content-Type:text/plain");
-    $user = intval(file_get_contents('php://input'));
-    $result = $connection->query("SELECT admins FROM adminsDB WHERE admins = '$user'");
-    if ($result->num_rows > 0) {
-        echo "admin";
-    } else {
-        echo "not admin";
-    }
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $stmt = $connection->prepare("INSERT INTO tokens (acctoken) VALUES (?)");
+        $stmt->bind_param('s', $accToken);
+        $stmt->execute();
+        $stmt->close();
 }
 $connection->close();
 ?>

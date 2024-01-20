@@ -1,5 +1,4 @@
 <?php
-session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     
 } 
@@ -8,6 +7,7 @@ $password = $_GET["PHP_AUTH_PW"];
 $resultString = $username . ':' . $password;
 $api_url = 'https://orioks.miet.ru/api/v1/auth'; 
 $encoded_auth = base64_encode($resultString); 
+
 $headers = array(
     'Accept: application/json',
     'Authorization: Basic ' . $encoded_auth,
@@ -30,11 +30,9 @@ if ($token === false) {
             'Authorization: Bearer ' . $decoded_response['token'],
             'User-Agent: TestApiAPP/0.1 Windows 10',
         ];
-        $_SESSION['user_id'] = $decoded_response;
         $ch2 = curl_init($api_url2);
         curl_setopt($ch2, CURLOPT_HTTPHEADER, $headersNew);
         curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-
         $response = curl_exec($ch2);
         $decoded_response2 = json_decode($response, true);
         echo $decoded_response2['full_name'];
