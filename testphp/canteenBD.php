@@ -12,7 +12,6 @@ if(!$connection->set_charset($charset)){
     echo "EncodeError";
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     header("Content-Type:application/json");
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);

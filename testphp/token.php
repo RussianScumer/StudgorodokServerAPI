@@ -19,9 +19,9 @@ if(!$connection->set_charset($charset)){
 }
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $stmt = $connection->prepare("INSERT INTO tokens (acctoken) VALUES (?)");
-        $stmt->bind_param('s', $accToken);
-        $stmt->execute();
-        $stmt->close();
+    $stmt->bind_param('s', $accToken);
+    $stmt->execute();
+    $stmt->close();
 }
 $connection->close();
 ?>
