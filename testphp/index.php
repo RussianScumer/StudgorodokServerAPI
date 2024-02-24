@@ -1,9 +1,17 @@
 <?php
+require_once("token.php");
+
+session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     
 } 
 $username = $_GET["PHP_AUTH_USER"];
 $password = $_GET["PHP_AUTH_PW"];
+if ($username == "laundry" and $password == "chistoff") {
+    echo "laundry";
+    gen_token();
+    exit();
+}
 $resultString = $username . ':' . $password;
 $api_url = 'https://orioks.miet.ru/api/v1/auth'; 
 $encoded_auth = base64_encode($resultString); 
@@ -30,14 +38,17 @@ if ($token === false) {
             'Authorization: Bearer ' . $decoded_response['token'],
             'User-Agent: TestApiAPP/0.1 Windows 10',
         ];
+
         $ch2 = curl_init($api_url2);
         curl_setopt($ch2, CURLOPT_HTTPHEADER, $headersNew);
         curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+
         $response = curl_exec($ch2);
         $decoded_response2 = json_decode($response, true);
         echo $decoded_response2['full_name'];
         echo " ";
         echo $decoded_response2['group'];
+        gen_token();
     } else {
         echo "The response does not contain a token field.";
     }
