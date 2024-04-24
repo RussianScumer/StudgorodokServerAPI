@@ -42,7 +42,6 @@ if ($token === false) {
         $ch2 = curl_init($api_url2);
         curl_setopt($ch2, CURLOPT_HTTPHEADER, $headersNew);
         curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-
         $response = curl_exec($ch2);
         $decoded_response2 = json_decode($response, true);
         echo $decoded_response2['full_name'];

@@ -1,12 +1,8 @@
 <?php
-$mysql_host = "localhost";
-$mysql_user = "a0872478_StudgorodokDB";
-$mysql_password = "BkmzRjhyttdtw2003!";
-$mysql_database = "a0872478_StudgorodokDB";
+include 'sqlauth.php';
+use sqlauth\sqlpass;
 $charset = 'utf8';
-
-// Подключение к базе данных
-$connection = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
+$connection = new mysqli(sqlpass::$mysql_host, sqlpass::$mysql_user, sqlpass::$mysql_password, sqlpass::$mysql_database);
 if ($connection->connect_error) {
     die("ConnectError: " . $connection->connect_error);
 }
